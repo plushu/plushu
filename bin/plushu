@@ -19,6 +19,11 @@ fi
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
+# Strip the leading "-c" argument that is added by (I assume) SSH
+if [[ $1 == "-c" ]]; then
+  shift
+fi
+
 # Run "commands" hooks for any plugins to handle
 for script in $PLUSHU_ROOT/plugins/*/commands; do
   $script "$@"
