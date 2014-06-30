@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+export PLUSHU_USER=${PLUSHU_USER:-"plushu"}
+export PLUSHU_ROOT=${PLUSHU_ROOT:-"/home/$PLUSHU_USER"}
+
+# Source configuration variables if the config file is present
+[[ -f $PLUSHU_ROOT/plushurc ]] && source $PLUSHU_ROOT/plushurc
+
+# Echo all commands if PLUSHU_TRACE is set
+[[ $PLUSHU_TRACE ]] && set -x
+
+# If any other user runs a plushu command, run it as the plushu user
+if [[ $(id -un) != $PLUSHU_USER ]]; then
+  sudo -u $PLUSHU_USER -H $0 "$@"
+  exit
+fi
+
+# Run "commands" hooks for any plugins to handle
+for script in $PLUSHU_ROOT/plugins/*/commands; do
+  $script "$@"
+done
+
+# Run command/subcommand scripts
+if [ -x $PLUSHU_ROOT/plugins/$1/command ]; then
+  "$PLUSHU_ROOT/plugins/$1/command" "$@"
+elif [ -x $PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:} ]; then
+  "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
+fi
