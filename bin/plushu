@@ -16,13 +16,14 @@ if [[ $(id -un) != $PLUSHU_USER ]]; then
   exit
 fi
 
+# Handle reentrant command-as-string arguments, as used by SSH
+if [[ $1 == "-c" ]]; then
+  xargs $0 <<<"$2"
+  exit
+fi
+
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
-
-# Strip the leading "-c" argument that is added by (I assume) SSH
-if [[ $1 == "-c" ]]; then
-  shift
-fi
 
 # Run "commands" hooks for any plugins to handle
 for script in $PLUSHU_ROOT/plugins/*/commands; do
@@ -30,8 +31,8 @@ for script in $PLUSHU_ROOT/plugins/*/commands; do
 done
 
 # Run command/subcommand scripts
-if [ -x $PLUSHU_ROOT/plugins/$1/command ]; then
+if [[ -x "$PLUSHU_ROOT/plugins/$1/command" ]]; then
   "$PLUSHU_ROOT/plugins/$1/command" "$@"
-elif [ -x $PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:} ]; then
+elif [[ -x "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" ]]; then
   "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
 fi
