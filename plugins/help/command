@@ -16,12 +16,12 @@ if [[ -n $2 ]]; then
     readmes=$(shopt -s nullglob; echo "$PLUSHU_ROOT/plugins/$2/README.*")
 
     # If that plugin has at least 1 README file
-    if [[ -f "$PLUSHU_ROOT/plugins/$2/README" || -n readmes ]]; then
+    if [[ -f "$PLUSHU_ROOT/plugins/$2/README" || -n $readmes ]]; then
 
       if [[ -f "$PLUSHU_ROOT/plugins/$2/README" ]]; then
         echofile "$PLUSHU_ROOT/plugins/$2/README"
       fi
-      for readme in readmes; do
+      for readme in $readmes; do
         echofile $readme
       done
 
