@@ -8,6 +8,10 @@ server for building and running web apps.
 
 [Dokku]: https://github.com/progrium/dokku
 
+## Prerequisites
+
+Although it's not a strict requirement, plushu is meant to be used with Git.
+
 ## Installing plushu
 
 **To do all this in one line: `sudo bash <(curl meta.sh/setup/plushu)`**
@@ -20,7 +24,7 @@ Clone the plushu repository into a new directory that will be used as the home
 directory for the plushu user. To put it in the standard home location:
 
 ```bash
-sudo git clone git@github.com:plushu/plushu /home/plushu
+sudo git clone https://github.com/plushu/plushu /home/plushu
 ```
 
 ### Step 2: Set up the user
