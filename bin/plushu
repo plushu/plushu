@@ -16,6 +16,9 @@ if [[ $(id -un) != $PLUSHU_USER ]]; then
   exit
 fi
 
+# For instances where a glob has no matches we want an empty list
+shopt -s nullglob
+
 # Run "commands" hooks for any plugins to handle
 for script in $PLUSHU_ROOT/plugins/*/commands; do
   $script "$@"
