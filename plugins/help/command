@@ -7,18 +7,18 @@ echofile () {
 }
 
 # If a plugin name was specified
-if [ -n $2 ]; then
+if [[ -n $2 ]]; then
 
   # If that plugin exists
-  if [ -d "$PLUSHU_ROOT/plugins/$2" ]; then
+  if [[ -d "$PLUSHU_ROOT/plugins/$2" ]]; then
 
     # Get all README files with a file extension
     readmes=$(shopt -s nullglob; echo "$PLUSHU_ROOT/plugins/$2/README.*")
 
     # If that plugin has at least 1 README file
-    if [ -f "$PLUSHU_ROOT/plugins/$2/README" || -n readmes ]; then
+    if [[ -f "$PLUSHU_ROOT/plugins/$2/README" || -n readmes ]]; then
 
-      if [ -f "$PLUSHU_ROOT/plugins/$2/README" ]; then
+      if [[ -f "$PLUSHU_ROOT/plugins/$2/README" ]]; then
         echofile "$PLUSHU_ROOT/plugins/$2/README"
       fi
       for readme in readmes; do
