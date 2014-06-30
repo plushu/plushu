@@ -10,7 +10,7 @@ server for building and running web apps.
 
 ## Installing plushu
 
-**To do all this in one line: `sudo bash <(curl meta.sh/install/plushu)`**
+**To do all this in one line: `sudo bash <(curl meta.sh/setup/plushu)`**
 
 This is the standard flow for installing plushu on a server:
 
