@@ -4,40 +4,62 @@ set -eo pipefail
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
-read -rd '' || true
+# Save all of STDIN in the default $REPLY variable
+# (discarding the non-zero exit code for reaching the end-of-file)
+read -rd '' ||:
 
-run_if_exec () {
+# Run a hook script, if it's executable, with the input from this invocation
+feedhook () {
   if [[ -f "$1" && -x "$1" ]]; then
     echo -n "$REPLY" | "$1"
   fi
 }
 
+# Run all numbered scripts under directories with this hook's name
 run_numbered_hook () {
-  local filelist=''
+  # Gather every file into an array, prefixing each item with the
+  # filename of the script (its position in sort order)
+  local filelist=()
   for hook in $PLUSHU_ROOT/plugins/*/hooks/$1/*; do
-    filelist+="${hook##*/} $hook"$'\n'
+    filelist+=("${hook##*/} $hook")
   done
-  filelist=`sort -n <<<"$filelist"`
-  while read hookline; do
-    run_if_exec ${hookline#* }
-  done <<<"$filelist"
+
+  # Use newline as separator for easy sortability
+  local IFS=$'\n'
+
+  # Sort the array numerically
+  filelist=(`printf '%s\n' "${filelist[@]}" | sort -n`)
+
+  # Call each script in sorted order
+  for hookline in "${filelist[@]}"; do
+    feedhook ${hookline#* }
+  done
 }
 
+# Ensure we have a hook name
 if [[ -z "$1" ]]; then
   echo "runhook: missing hook name" >&2
   exit 1
 fi
 
+# Ensure we have a root directory
 if [[ -z "$PLUSHU_ROOT" ]]; then
   echo "runhook: PLUSHU_ROOT not defined" >&2
   exit 1
 fi
 
+# Run ordered pre-hooks
 run_numbered_hook pre-$1
+
+# Run other pre-hooks
 for hook in $PLUSHU_ROOT/plugins/*/hooks/pre-$1; do
-  run_if_exec $hook
+  feedhook $hook
 done
+
+# Run normal hooks
 for hook in $PLUSHU_ROOT/plugins/*/hooks/$1; do
-  run_if_exec $hook
+  feedhook $hook
 done
+
+# Run ordered (post)hooks
 run_numbered_hook $1
