@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# For instances where a glob has no matches we want an empty list
+shopt -s nullglob
+
+# Make a file for our input (which will be sent to each hook),
+# and for the outputs of each hook (which will be sent as stdout)
+infile=`mktemp`
+cat >$infile
+outfile=`mktemp`
+
+run_if_exec () {
+  if [[ -f "$1" && -x "$1" ]]; then
+    "$1" <$infile >>$outfile
+  fi
+}
+
+run_numbered_hook () {
+  local filelist=''
+  for hook in $PLUSHU_ROOT/plugins/*/hooks/$1/*; do
+    filelist+="${hook##*/} $hook"$'\n'
+  done
+  filelist=`sort -n <<<"$filelist"`
+  while read hookline; do
+    run_if_exec ${hookline#* }
+  done <<<"$filelist"
+}
+
+if [[ -z "$1" ]]; then
+  echo "runhook: missing hook name" >&2
+  exit 1
+fi
+
+if [[ -z "$PLUSHU_ROOT" ]]; then
+  echo "runhook: PLUSHU_ROOT not defined" >&2
+  exit 1
+fi
+
+run_numbered_hook pre-$1
+for hook in $PLUSHU_ROOT/plugins/*/hooks/pre-$1; do
+  run_if_exec $hook
+done
+for hook in $PLUSHU_ROOT/plugins/*/hooks/$1; do
+  run_if_exec $hook
+done
+run_numbered_hook $1
+
+cat $outfile
+rm $infile $outfile
