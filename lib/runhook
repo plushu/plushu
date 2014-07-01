@@ -4,15 +4,11 @@ set -eo pipefail
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
-# Make a file for our input (which will be sent to each hook),
-# and for the outputs of each hook (which will be sent as stdout)
-infile=`mktemp`
-cat >$infile
-outfile=`mktemp`
+read -rd '' || true
 
 run_if_exec () {
   if [[ -f "$1" && -x "$1" ]]; then
-    "$1" <$infile >>$outfile
+    echo -n "$REPLY" | "$1"
   fi
 }
 
@@ -45,6 +41,3 @@ for hook in $PLUSHU_ROOT/plugins/*/hooks/$1; do
   run_if_exec $hook
 done
 run_numbered_hook $1
-
-cat $outfile
-rm $infile $outfile
