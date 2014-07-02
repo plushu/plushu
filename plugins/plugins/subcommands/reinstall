@@ -2,27 +2,27 @@
 set -eo pipefail
 
 # If a plugin name was specified
-if [ -n $2 ]; then
+if [[ -n $2 ]]; then
 
   # If that plugin exists
-  if [ -d "$PLUSHU_ROOT/plugins/$2"]; then
+  if [[ -d "$PLUSHU_ROOT/plugins/$2" ]]; then
 
     # If that plugin has an install script
-    if [ -f "$PLUSHU_ROOT/plugins/$2/install" ]; then
+    if [[ -f "$PLUSHU_ROOT/plugins/$2/install" ]]; then
 
-      # We don't test for executable status, we just let the shell fail if
-      # the install script isn't set executable
+      # We don't test for executable status, we just
+      # let the shell fail if the install script isn't set executable
       "$PLUSHU_ROOT/plugins/$2/install"
     fi
 
   # If that plugin does not exist
   else
-    echo "Plugin \"$2\" not found"
+    echo "Plugin '$2' not found" >&2
     exit 1
   fi
 
 # If no plugin name was specified
 else
-  echo "Missing name of plugin to reinstall"
+  echo "Missing name of plugin to reinstall" >&2
   exit 1
 fi
