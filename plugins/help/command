@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-echofile () {
-  # cat file, ensuring newline at EOF
-  sed -e '$a\' $@
-}
+PAGER=${PAGER:-less}
 
 # If a plugin name was specified
 if [[ -n $2 ]]; then
@@ -19,21 +16,21 @@ if [[ -n $2 ]]; then
     if [[ -f "$PLUSHU_ROOT/plugins/$2/README" || -n $readmes ]]; then
 
       if [[ -f "$PLUSHU_ROOT/plugins/$2/README" ]]; then
-        echofile "$PLUSHU_ROOT/plugins/$2/README"
+        $PAGER "$PLUSHU_ROOT/plugins/$2/README"
       fi
       for readme in $readmes; do
-        echofile $readme
+        $PAGER "$readme"
       done
 
     # If that plugin does not have any README files
     else
-      echo "No README for $2"
+      echo "No README for $2" >&2
       exit 1
     fi
 
   # If that plugin does not exist
   else
-    echo "Plugin \"$2\" not found"
+    echo "Plugin '$2' not found" >&2
     exit 1
   fi
 
