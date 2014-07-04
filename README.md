@@ -10,7 +10,9 @@ server for building and running web apps.
 
 ## Prerequisites
 
-Although it's not a strict requirement, plushu is meant to be used with Git.
+Although it's not a strict requirement, plushu is meant to be used with Git
+installed, as this allows plushu to install plugins via `git clone` and
+determine versions with `git describe`.
 
 ## Installing plushu
 
@@ -66,11 +68,13 @@ Note that, by default, plushu does *not* discriminate between authorized keys
 in any way. If you need this (for instance, to have administrative and normal
 users), you should install a plugin and edit authorized_keys accordingly.
 
-## Using plushu
+## Accessing plushu
 
 On installation, plushu creates a user whose login shell is the base plushu
-script. As the plushu script is not interactive, you use
-`ssh plushu@example.com` followed by arguments as your plushu command.
+script. You use `ssh -t plushu@example.com` followed by arguments as your
+plushu command. (The '-t' option makes it so that SSH requests a full TTY
+when executing the command: you don't strictly need it if your commands aren't
+interactive, but it's a good basis
 
 So, for example, if you would use this on the server:
 
@@ -81,5 +85,22 @@ plushu help
 You would use this on the client:
 
 ```bash
-ssh plushu@example.com help
+ssh -t plushu@example.com help
+```
+
+See https://github.com/plushu/plushu/wiki/Client for ways you can create a
+shortcut for this.
+
+## Usage
+
+To get the list of plugins installed in plushu:
+
+```bash
+plushu plugins
+```
+
+To read the README for any given plugin:
+
+```bash
+plushu help <plugin>
 ```
