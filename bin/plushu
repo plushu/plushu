@@ -10,12 +10,6 @@ export PLUSHU_ROOT=${PLUSHU_ROOT:-"/home/$PLUSHU_USER"}
 # Echo all commands if PLUSHU_TRACE is set
 [[ $PLUSHU_TRACE ]] && set -x
 
-# If any other user runs a plushu command, run it as the plushu user
-if [[ $(id -un) != $PLUSHU_USER ]]; then
-  sudo -u $PLUSHU_USER -H $0 "$@"
-  exit
-fi
-
 # Handle reentrant command-as-string arguments, as used by SSH
 if [[ $1 == "-c" ]]; then
   xargs $0 <<<"$2"
