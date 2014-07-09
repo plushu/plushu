@@ -8,10 +8,13 @@ shopt -s nullglob
 # (discarding the non-zero exit code for reaching the end-of-file)
 read -rd '' ||:
 
+hookname=$1
+shift
+
 # Run a hook script, if it's executable, with the input from this invocation
 feedhook () {
   if [[ -f "$1" && -x "$1" ]]; then
-    echo -n "$REPLY" | "$1"
+    echo -n "$REPLY" | "$@"
   fi
 }
 
@@ -37,7 +40,7 @@ run_numbered_hook () {
 }
 
 # Ensure we have a hook name
-if [[ -z "$1" ]]; then
+if [[ -z "$hookname" ]]; then
   echo "runhook: missing hook name" >&2
   exit 1
 fi
@@ -52,13 +55,13 @@ fi
 run_numbered_hook pre-$1
 
 # Run other pre-hooks
-for hook in $PLUSHU_ROOT/plugins/*/hooks/pre-$1; do
-  feedhook $hook
+for hook in $PLUSHU_ROOT/plugins/*/hooks/pre-$hookname; do
+  feedhook $hook "$@"
 done
 
 # Run normal hooks
-for hook in $PLUSHU_ROOT/plugins/*/hooks/$1; do
-  feedhook $hook
+for hook in $PLUSHU_ROOT/plugins/*/hooks/$hookname; do
+  feedhook $hook "$@"
 done
 
 # Run ordered (post)hooks
