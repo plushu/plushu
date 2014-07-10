@@ -22,7 +22,8 @@ fi
 # Run a hook script, if it's executable, with the input from this invocation
 exechook () {
   if [[ -f "$1" && -x "$1" ]]; then
-    echo -n "$REPLY" | "$@"
+    subpath=${1#$PLUSHU_ROOT/plugins/}
+    echo -n "$REPLY" | PLUSHU_PLUGIN_NAME=${subpath%%/*} "$@"
   fi
 }
 

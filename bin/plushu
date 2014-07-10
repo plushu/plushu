@@ -26,7 +26,7 @@ done
 
 # Run command/subcommand scripts
 if [[ -x "$PLUSHU_ROOT/plugins/$1/command" ]]; then
-  "$PLUSHU_ROOT/plugins/$1/command" "$@"
+  PLUSHU_PLUGIN_NAME=$1 "$PLUSHU_ROOT/plugins/$1/command" "$@"
 elif [[ -x "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" ]]; then
-  "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
+  PLUSHU_PLUGIN_NAME=${1%%:*} "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
 fi
