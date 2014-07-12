@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PLUSHU_USER=${PLUSHU_USER:-"plushu"}
-export PLUSHU_ROOT=${PLUSHU_ROOT:-"/home/$PLUSHU_USER"}
+export PLUSHU_ROOT=${PLUSHU_ROOT:-~plushu}
 
 # Source configuration variables if the config file is present
 [[ -f $PLUSHU_ROOT/plushurc ]] && source $PLUSHU_ROOT/plushurc

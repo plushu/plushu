@@ -2,7 +2,6 @@
 set -eo pipefail
 
 # Setup parameters
-: ${PLUSHU_USER:=plushu}
 : ${PLUSHU_ROOT:=$(cd "$(dirname "$0")" && pwd)}
 : ${PLUSHU_SCRIPT:=$PLUSHU_ROOT/bin/plushu}
 
@@ -10,8 +9,8 @@ set -eo pipefail
 BIN_DIR=${BIN_DIR-/usr/local/bin}
 
 # Create the plushu user if they do not exist
-if ! id -u $PLUSHU_USER >/dev/null 2>&1; then
-  useradd -Md $PLUSHU_ROOT -s $PLUSHU_SCRIPT $PLUSHU_USER
+if ! id -u plushu >/dev/null 2>&1; then
+  useradd -Md $PLUSHU_ROOT -s $PLUSHU_SCRIPT plushu
 fi
 
 # Initialize the ssh settings
@@ -19,7 +18,7 @@ mkdir -p $PLUSHU_ROOT/.ssh
 touch $PLUSHU_ROOT/.ssh/authorized_keys
 
 # Set appropriate ownership and permissions
-chown -R $PLUSHU_USER $PLUSHU_ROOT
+chown -R plushu $PLUSHU_ROOT
 chmod g-w $PLUSHU_ROOT $PLUSHU_ROOT/.ssh $PLUSHU_ROOT/.ssh/authorized_keys
 
 
