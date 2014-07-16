@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PLUSHU_ROOT=${PLUSHU_ROOT:-~plushu}
+if [[ $EUID == 0 ]]; then
+  export PLUSHU_ROOT=${PLUSHU_ROOT:-~plushu}
+else
+  export PLUSHU_ROOT=${PLUSHU_ROOT:-$HOME}
+fi
 
 # Source configuration variables if the config file is present
-[[ -f $PLUSHU_ROOT/plushurc ]] && source $PLUSHU_ROOT/plushurc
+if [[ -f $PLUSHU_ROOT/.plushurc ]]; then
+  source $PLUSHU_ROOT/.plushurc
+else
+  cat >&2 <<EOF
+No ~/.plushurc found. If you want to run plushu as the plushu user, try:
+
+\$ sudo -u plushu plushu $@
+EOF
+  exit 1
+fi
 
 # Echo all commands if PLUSHU_TRACE is set
 [[ $PLUSHU_TRACE ]] && set -x
