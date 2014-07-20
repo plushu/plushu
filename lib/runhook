@@ -8,27 +8,17 @@ shopt -s nullglob
 hookname=$1
 shift
 
-# If stdin is a terminal (as it can be when testing runhook)
-if [[ -t 0 ]]; then
-  # Clear the REPLY variable (no input)
-  REPLY=
-# If stdin is not a terminal
-else
-  # Save all of stdin in the default $REPLY variable
-  # (discarding the non-zero exit code for reaching the end-of-file)
-  read -rd '' ||:
-fi
+hooks=()
 
 # Run a hook script, if it's executable, with the input from this invocation
-exechook () {
+append_hook () {
   if [[ -f "$1" && -x "$1" ]]; then
-    subpath=${1#$PLUSHU_ROOT/plugins/}
-    echo -n "$REPLY" | PLUSHU_PLUGIN_NAME=${subpath%%/*} "$@"
+    hooks+=("$1")
   fi
 }
 
 # Run all numbered scripts under directories with this hook's name
-run_numbered_hook () {
+append_numbered_hooks () {
   local hookname=$1
   shift
 
@@ -45,9 +35,9 @@ run_numbered_hook () {
   # Sort the array numerically
   filelist=(`printf '%s\n' "${filelist[@]}" | sort -n`)
 
-  # Call each script in sorted order
+  # Append each script in sorted order
   for hookline in "${filelist[@]}"; do
-    exechook ${hookline#* } "$@"
+    append_hook ${hookline#* }
   done
 }
 
@@ -64,17 +54,31 @@ if [[ -z "$PLUSHU_ROOT" ]]; then
 fi
 
 # Run ordered pre-hooks
-run_numbered_hook pre-$hookname "$@"
+append_numbered_hooks pre-$hookname
 
 # Run other pre-hooks
 for hook in $PLUSHU_ROOT/plugins/*/hooks/pre-$hookname; do
-  exechook $hook "$@"
+  append_hook $hook
 done
 
 # Run normal hooks
 for hook in $PLUSHU_ROOT/plugins/*/hooks/$hookname; do
-  exechook $hook "$@"
+  append_hook $hook
 done
 
 # Run ordered (post)hooks
-run_numbered_hook $hookname "$@"
+append_numbered_hooks $hookname
+
+if [[ -n ${hooks[0]} ]]; then
+  if [[ -z ${hooks[1]} ]]; then
+    ${hooks[0]} "$@"
+  else
+    input=`mktemp`;
+    cat >"$input"
+    for hook in "${hooks[@]}"; do
+      subpath=${hook#$PLUSHU_ROOT/plugins/}
+      PLUSHU_PLUGIN_NAME=${subpath%%/*} $hook "$@" <"$input"
+    done
+    rm "$input"
+  fi
+fi
