@@ -54,7 +54,8 @@ shopt -s nullglob
 
 # Run "commands" hooks for any plugins to handle
 for script in $PLUSHU_ROOT/plugins/*/commands; do
-  $script "$@"
+  plugin_path=${script%/commands}
+  PLUSHU_PLUGIN_NAME=${plugin_path#$PLUSHU_ROOT/plugins/} "$script" "$@"
 done
 
 # Run command/subcommand scripts
