@@ -17,10 +17,8 @@ fi
 mkdir -p $PLUSHU_ROOT/.ssh
 touch $PLUSHU_ROOT/.ssh/authorized_keys
 
-# Set appropriate ownership and permissions
-chown -R plushu $PLUSHU_ROOT
-chmod g-w $PLUSHU_ROOT $PLUSHU_ROOT/.ssh $PLUSHU_ROOT/.ssh/authorized_keys
-
+# Create an empty .plushurc to mark the PLUSHU_ROOT as valid and live
+touch $PLUSHU_ROOT/.plushurc
 
 # Link the plushu script into the bin dir
 if [ -n $BIN_DIR ]; then
@@ -31,3 +29,7 @@ fi
 if [ -d $PLUSHU_ROOT/.git/info ]; then
   echo '*' > $PLUSHU_ROOT/.git/info/exclude
 fi
+
+# Set appropriate ownership and permissions
+chown -R plushu $PLUSHU_ROOT
+chmod g-w $PLUSHU_ROOT $PLUSHU_ROOT/.ssh $PLUSHU_ROOT/.ssh/authorized_keys
