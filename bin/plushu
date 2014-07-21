@@ -1,21 +1,42 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+# If PLUSHU_ROOT is not specially defined, use our home directory
+# (or default to the home directory of the "plushu" user, if running as root)
 if [[ $EUID == 0 ]]; then
   export PLUSHU_ROOT=${PLUSHU_ROOT:-~plushu}
 else
   export PLUSHU_ROOT=${PLUSHU_ROOT:-$HOME}
 fi
 
-# Source configuration variables if the config file is present
-if [[ -f $PLUSHU_ROOT/.plushurc ]]; then
-  source $PLUSHU_ROOT/.plushurc
-else
-  cat >&2 <<EOF
-No ~/.plushurc found. If you want to run plushu as the plushu user, try:
+echo_missing_plushurc_msg () {
+cat <<EOF
+This file just needs to be present; you can create an empty one with:
+
+\$ sudo -u plushu touch $PLUSHU_ROOT/.plushurc
+EOF
+}
+
+echo_run_as_plushu_msg () {
+cat <<EOF
+If you meant to run plushu as the plushu user, try:
 
 \$ sudo -u plushu plushu $@
 EOF
+}
+
+# Source configuration variables if the config file is present -
+# if the config file is not present, don't trust this as a PLUSHU_ROOT
+if [[ -f $PLUSHU_ROOT/.plushurc ]]; then
+  source $PLUSHU_ROOT/.plushurc
+else
+  echo "No ~/.plushurc found." >&2
+  echo >&2
+  if [[ "$USER" == "plushu" ]]; then
+    echo_missing_plushurc_msg >&2
+  else
+    echo_run_as_plushu_msg >&2
+  fi
   exit 1
 fi
 
