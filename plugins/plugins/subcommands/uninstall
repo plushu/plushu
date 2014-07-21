@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -eo pipefail; [[ $PLUSHU_TRACE ]] && set -x
 
 # If a plugin name was specified
 if [[ -n $2 ]]; then

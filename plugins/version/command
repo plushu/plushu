@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -eo pipefail; [[ $PLUSHU_TRACE ]] && set -x
 
 # Set the Git directory to read plushu's version from
 export GIT_DIR="$PLUSHU_ROOT/.git"
