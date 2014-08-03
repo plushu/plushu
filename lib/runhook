@@ -69,10 +69,10 @@ done
 # Run ordered (post)hooks
 append_numbered_hooks "$hookname"
 
-if [[ -n ${hooks[0]} ]]; then
-  if [[ -z ${hooks[1]} ]]; then
+if [[ -n "${hooks[0]}" ]]; then
+  if [[ -z "${hooks[1]}" ]]; then
     subpath=${hooks[0]#$PLUSHU_ROOT/plugins/}
-    PLUSHU_PLUGIN_NAME=${subpath%%/*} "{hooks[0]}" "$@"
+    PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@"
   else
     input=`mktemp`;
     cat >"$input"
