@@ -5,9 +5,10 @@ set -eo pipefail; [[ $PLUSHU_TRACE ]] && set -x
 if [[ -n $2 ]]; then
 
   case "$2" in
-    git:*|ssh:*|*@*)
+    git:*|ssh:*|*@*:*)
       remote=$2
-      defname=${2##*/}
+      defname=${2#*:}
+      defname=${defname##*/}
       ;;
     */*)
       remote=https://github.com/$2.git
@@ -20,6 +21,7 @@ if [[ -n $2 ]]; then
   esac
   defname=${defname#plushu-}
   defname=${defname%-plugin}
+  defname=${defname%.git}
   target=${3:-$defname}
 
   # If the plugin already exists
