@@ -5,7 +5,7 @@ set -eo pipefail; [[ $PLUSHU_TRACE ]] && set -x
 if [[ -n $2 ]]; then
 
   case "$2" in
-    git:*|ssh:|*@*)
+    git:*|ssh:*|*@*)
       remote=$2
       defname=${2##*/}
       ;;
