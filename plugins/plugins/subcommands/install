@@ -37,6 +37,12 @@ EOF
   else
     git clone $remote "$PLUSHU_ROOT/plugins/$target"
 
+    # When installing as root, give the plushu user ownership of everything
+    # within the newly-cloned plugin
+    if [[ $EUID == 0 ]]; then
+      chown -R plushu "$PLUSHU_ROOT/plugins/$target"
+    fi
+
     # If the newly-cloned plugin has an install script
     if [[ -f "$PLUSHU_ROOT/plugins/$target/install" ]]; then
 
