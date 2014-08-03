@@ -12,7 +12,7 @@ if [[ -n $2 ]]; then
 
       # We don't test for executable status, we just
       # let the shell fail if the uninstall script isn't set executable
-      "$PLUSHU_ROOT/plugins/$2/uninstall"
+      PLUSHU_PLUGIN_NAME="$2" "$PLUSHU_ROOT/plugins/$2/uninstall"
     fi
 
     # Remove the plugin
