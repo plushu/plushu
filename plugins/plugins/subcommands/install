@@ -10,11 +10,11 @@ if [[ -n $2 ]]; then
       defname=${2##*/}
       ;;
     */*)
-      remote=git@github.com:$2.git
+      remote=https://github.com:$2.git
       defname=${2##*/}
       ;;
     *)
-      remote=git@github.com:plushu/plushu-${2#plushu-}.git
+      remote=https://github.com:plushu/plushu-${2#plushu-}.git
       defname=$2
       ;;
   esac
