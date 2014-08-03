@@ -40,7 +40,7 @@ EOF
 
       # We don't test for executable status, we just
       # let the shell fail if the install script isn't set executable
-      "$PLUSHU_ROOT/plugins/$target/install"
+      PLUSHU_PLUGIN_NAME="$target" "$PLUSHU_ROOT/plugins/$target/install"
 
     else
       # Notify that the plugin has been installed
