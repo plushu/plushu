@@ -21,7 +21,7 @@ echo_run_as_plushu_msg () {
 cat <<EOF
 If you meant to run plushu as the plushu user, try:
 
-\$ sudo -u plushu plushu $@
+\$ sudo -iu plushu $@
 EOF
 }
 
