@@ -75,32 +75,33 @@ done
 # Run ordered (post)hooks
 append_numbered_hooks "$hookname"
 
-# If we have a hook
-if [[ -n "${hooks[0]}" ]]; then
-  # If we don't have a second hook
-  if [[ -z "${hooks[1]}" ]]; then
-    # Run the only hook directly
-    subpath=${hooks[0]#$PLUSHU_ROOT/plugins/}
-    PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@"
-  # If we have more than one hook
-  else
-    # If we're supposed to multiplex stdin, save it to a temp file
+# If we have only one hook
+if [[ "${#hooks[@]}" == 1 ]]; then
+  # Run it directly
+  subpath=${hooks[0]#$PLUSHU_ROOT/plugins/}
+  PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@"
+
+# If we have more than one hook
+elif [[ "${#hooks[@]}" != 0 ]]; then
+
+  # If we're supposed to multiplex stdin, save it to a temp file
+  if [[ -n "$input" ]]; then
+    input=`mktemp`;
+    cat >"$input"
+  fi
+
+  # Run each hook, directing our saved input (if we have any) to it
+  for hook in "${hooks[@]}"; do
+    subpath=${hook#$PLUSHU_ROOT/plugins/}
     if [[ -n "$input" ]]; then
-      input=`mktemp`;
-      cat >"$input"
+      PLUSHU_PLUGIN_NAME=${subpath%%/*} "$hook" "$@" <"$input"
+    else
+      PLUSHU_PLUGIN_NAME=${subpath%%/*} "$hook" "$@" </dev/null
     fi
-    # Run each hook, directing our saved input (if we have any) to it
-    for hook in "${hooks[@]}"; do
-      subpath=${hook#$PLUSHU_ROOT/plugins/}
-      if [[ -n "$input" ]]; then
-        PLUSHU_PLUGIN_NAME=${subpath%%/*} "$hook" "$@" <"$input"
-      else
-        PLUSHU_PLUGIN_NAME=${subpath%%/*} "$hook" "$@" </dev/null
-      fi
-    done
-    # If we saved the input to a temporary file, clean up
-    if [[ -n "$input" ]]; then
-      rm "$input"
-    fi
+  done
+
+  # If we saved the input to a temporary file, clean up
+  if [[ -n "$input" ]]; then
+    rm "$input"
   fi
 fi
