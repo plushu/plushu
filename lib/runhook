@@ -26,7 +26,7 @@ append_numbered_hooks () {
   # filename of the script (its position in sort order)
   local filelist=()
   for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$hookname"/*; do
-    filelist+=("${hook##*/} $hook")
+    filelist+=("${hook##*/}/$hook")
   done
 
   # Use newline as separator for easy sortability
@@ -37,7 +37,7 @@ append_numbered_hooks () {
 
   # Append each script in sorted order
   for hookline in "${filelist[@]}"; do
-    append_hook "${hookline#* }"
+    append_hook "${hookline#*/}"
   done
 }
 
