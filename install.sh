@@ -27,7 +27,7 @@ fi
 
 # If the root is a git clone, set it to ignore new files
 if [ -d $PLUSHU_ROOT/.git/info ]; then
-  echo '*' > $PLUSHU_ROOT/.git/info/exclude
+  printf '*\n' > $PLUSHU_ROOT/.git/info/exclude
 fi
 
 # Set appropriate ownership and permissions

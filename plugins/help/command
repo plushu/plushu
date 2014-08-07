@@ -42,16 +42,20 @@ if [[ -n $2 ]]; then
   # If that plugin exists
   if [[ -d "$PLUSHU_ROOT/plugins/$plugin" ]]; then
 
+    # For instances where a glob has no matches we want an empty list
+    shopt -s nullglob
+
     # Get all README files with a file extension
-    readmes=$(shopt -s nullglob; echo "$PLUSHU_ROOT/plugins/$plugin/README.*")
+    readmes=("$PLUSHU_ROOT/plugins/$plugin"/README.*)
 
     # If that plugin has at least 1 README file
-    if [[ -f "$PLUSHU_ROOT/plugins/$plugin/README" || -n $readmes ]]; then
+    if [[ -f "$PLUSHU_ROOT/plugins/$plugin/README" || "${#readmes[@]}" != 0 ]]
+    then
 
       if [[ -f "$PLUSHU_ROOT/plugins/$plugin/README" ]]; then
         runpager "$PLUSHU_ROOT/plugins/$plugin/README" "$query"
       fi
-      for readme in $readmes; do
+      for readme in "${readmes[@]}"; do
         runpager "$readme" "$query"
       done
 
