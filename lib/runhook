@@ -77,9 +77,13 @@ append_numbered_hooks "$hookname"
 
 # If we have only one hook
 if [[ "${#hooks[@]}" == 1 ]]; then
-  # Run it directly
+  # Run it directly, only exposing input if opted in
   subpath=${hooks[0]#$PLUSHU_ROOT/plugins/}
-  PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@"
+  if [[ -n "$input" ]]; then
+    PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@"
+  else
+    PLUSHU_PLUGIN_NAME=${subpath%%/*} "${hooks[0]}" "$@" </dev/null
+  fi
 
 # If we have more than one hook
 elif [[ "${#hooks[@]}" != 0 ]]; then
