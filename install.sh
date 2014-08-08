@@ -17,8 +17,10 @@ fi
 mkdir -p $PLUSHU_ROOT/.ssh
 touch $PLUSHU_ROOT/.ssh/authorized_keys
 
-# Create an empty .plushurc to mark the PLUSHU_ROOT as valid and live
-touch $PLUSHU_ROOT/.plushurc
+# Create an initial .plushurc
+cat >>$PLUSHU_ROOT/.plushurc <<"EOF"
+PATH=$HOME/bin:$PATH
+EOF
 
 # Link the plushu script into the bin dir
 if [ -n $BIN_DIR ]; then
