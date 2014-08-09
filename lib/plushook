@@ -49,13 +49,13 @@ append_numbered_hooks () {
 
 # Ensure we have a hook name
 if [[ -z "$hookname" ]]; then
-  echo "runhook: missing hook name" >&2
+  echo "plushook: missing hook name" >&2
   exit 1
 fi
 
 # Ensure we have a root directory
 if [[ -z "$PLUSHU_ROOT" ]]; then
-  echo "runhook: PLUSHU_ROOT not defined" >&2
+  echo "plushook: PLUSHU_ROOT not defined" >&2
   exit 1
 fi
 
