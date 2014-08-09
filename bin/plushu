@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+# Handle reentrant command-as-string arguments, as used by SSH
+if [[ $1 == "-c" ]]; then
+  xargs -xa <(printf '%s\n' "$2") "$0"
+  exit
+fi
+
 # If PLUSHU_ROOT is not specially defined, use our home directory
 # (or default to the home directory of the "plushu" user, if running as root)
 if [[ $EUID == 0 ]]; then
@@ -46,14 +52,14 @@ else
   exit 1
 fi
 
+# Handle trace flag
+while [[ $1 == "--trace" || $1 == "-t" ]]; do
+  export PLUSHU_TRACE=1
+  shift
+done
+
 # Echo all commands if PLUSHU_TRACE is set
 [[ $PLUSHU_TRACE ]] && set -x
-
-# Handle reentrant command-as-string arguments, as used by SSH
-if [[ $1 == "-c" ]]; then
-  xargs -xa <(printf '%s\n' "$2") "$0"
-  exit
-fi
 
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
