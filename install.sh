@@ -23,6 +23,16 @@ cat >$PLUSHU_ROOT/.plushurc <<"EOF"
 PATH=$HOME/bin:$PATH
 EOF
 
+# Install the core plugins
+mkdir -p $PLUSHU_ROOT/plugins
+if [ ! -d $PLUSHU_ROOT/plugins/plugins ]; then
+  git clone https://github.com/plushu/plushu-plugins-plugin \
+    $PLUSHU_ROOT/plugins/plugins
+fi
+if [ ! -d $PLUSHU_ROOT/plugins/help ]; then
+  plushu plugins:install help-plugin
+fi
+
 # Create the plushu user if they do not exist
 if ! id -u plushu >/dev/null 2>&1; then
   useradd -Md $PLUSHU_ROOT -s $PLUSHU_SCRIPT plushu
