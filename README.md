@@ -104,3 +104,14 @@ To read the README for any given plugin:
 ```bash
 plushu help <plugin>
 ```
+
+To get Plushu's version:
+
+```bash
+plushu --version
+```
+
+(The short alias `-v` works as well.)
+
+Plushu reads its version based on the Git revision currently checked out, so it
+will not work if PLUSHU_ROOT is not a Git repository.

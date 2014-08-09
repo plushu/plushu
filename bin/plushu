@@ -61,6 +61,17 @@ done
 # Echo all commands if PLUSHU_TRACE is set
 [[ $PLUSHU_TRACE ]] && set -x
 
+# Handle version flag
+if [[ $1 == "--version" || $1 == "-v" ]]; then
+  if [ -d "$PLUSHU_ROOT/.git" ]; then
+    GIT_DIR="$PLUSHU_ROOT/.git" git describe
+    exit 0
+  else
+    echo "No .git directory in $PLUSHU_ROOT, version unknown"
+    exit 1
+  fi
+fi
+
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
