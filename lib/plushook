@@ -35,11 +35,8 @@ append_numbered_hooks () {
     filelist+=("${hook##*/}/$hook")
   done
 
-  # Use newline as separator for easy sortability
-  local IFS=$'\n'
-
   # Sort the array numerically
-  filelist=(`printf '%s\n' "${filelist[@]}" | sort -n`)
+  printf '%s\0' "${filelist[@]}" | sort -nz | IFS= read -rd '' -a filelist
 
   # Append each script in sorted order
   for hookline in "${filelist[@]}"; do
