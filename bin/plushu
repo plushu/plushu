@@ -75,15 +75,61 @@ fi
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
-# Run "commands" hooks for any plugins to handle
-for script in $PLUSHU_ROOT/plugins/*/commands; do
-  plugin_path=${script%/commands}
-  PLUSHU_PLUGIN_NAME=${plugin_path#$PLUSHU_ROOT/plugins/} "$script" "$@"
+sourcelist=
+# Load numbered scripts in plugins into sourcelist
+load_sourcelist () {
+  # Initialize the empty list
+  sourcelist=()
+
+  # For each null-separated "line"
+  while IFS= read -rd '' scriptline; do
+    # Append the hook's filename to the list of hooks
+    sourcelist+=("${scriptline#*/}")
+  # Echo the potential hook names to numerically sort (filename first),
+  # zero-separated to avoid any possible whitespace-in-filename issues,
+  # then direct the zero-separated hook names to `read`
+  # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
+  done < <(for script in "$PLUSHU_ROOT"/plugins/*/"$1"/*; do
+    printf '%s\0' "${script##*/}/$script"
+  done | sort -nz)
+}
+
+# Source pre-commands
+load_sourcelist pre-commands
+for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands; do
+  # If the path is a file (not a folder)
+  if [[ -f "$script" ]]; then
+    plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+    PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
+  fi
 done
 
-# Run command/subcommand scripts
-if [[ -x "$PLUSHU_ROOT/plugins/$1/command" ]]; then
-  PLUSHU_PLUGIN_NAME=$1 "$PLUSHU_ROOT/plugins/$1/command" "$@"
-elif [[ -x "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" ]]; then
-  PLUSHU_PLUGIN_NAME=${1%%:*} "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
+# If a pre-commands hook didn't handle the command
+if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
+  # Run command/subcommand script
+  if [[ -x "$PLUSHU_ROOT/plugins/$1/command" ]]; then
+    PLUSHU_PLUGIN_NAME=$1 "$PLUSHU_ROOT/plugins/$1/command" "$@"
+    PLUSHU_COMMAND_HANDLED=$1
+  elif [[ -x "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" ]]; then
+    PLUSHU_PLUGIN_NAME=${1%%:*} \
+      "$PLUSHU_ROOT/plugins/${1%%:*}/subcommands/${1#*:}" "$@"
+    PLUSHU_COMMAND_HANDLED=$1
+  fi
+fi
+
+# If there wasn't a command script to handle it
+if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
+  # Source commands
+  load_sourcelist commands
+  for script in "$PLUSHU_ROOT/plugins"/*/commands "${sourcelist[@]}"; do
+    # If the path is a file (not a folder)
+    if [[ -f "$script" ]]; then
+      plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+      PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
+    fi
+  done
+fi
+
+if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
+  echo "\`$1\`: command not recognized"
 fi
