@@ -25,8 +25,14 @@ append_hook () {
 
 # Run all numbered scripts under directories with this hook's name
 append_numbered_hooks () {
+  # For each null-separated "line"
   while IFS= read -rd '' hookline; do
+    # Append the hook's filename to the list of hooks
     append_hook "${hookline#*/}"
+  # Echo the potential hook names to numerically sort (filename first),
+  # zero-separated to avoid any possible whitespace-in-filename issues,
+  # then direct the zero-separated hook names to `read`
+  # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
   done < <(for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$1"/*; do
     printf '%s\0' "${hook##*/}/$hook"
   done | sort -nz)
