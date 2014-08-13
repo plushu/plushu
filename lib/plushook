@@ -25,21 +25,9 @@ append_hook () {
 
 # Run all numbered scripts under directories with this hook's name
 append_numbered_hooks () {
-  local hookname=$1
-  shift
-
-  # Gather every file into an array, prefixing each item with the
-  # filename of the script (its position in sort order)
-  local filelist=()
-  for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$hookname"/*; do
-    filelist+=("${hook##*/}/$hook")
-  done
-
-  # Sort the array numerically
-  printf '%s\0' "${filelist[@]}" | sort -nz | IFS= read -rd '' -a filelist
-
-  # Append each script in sorted order
-  for hookline in "${filelist[@]}"; do
+  for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$1"/*; do
+    printf '%s\0' "${hook##*/}/$hook"
+  done | sort -nz | while IFS= read -rd '' hookline; do
     append_hook "${hookline#*/}"
   done
 }
