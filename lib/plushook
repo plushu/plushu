@@ -25,13 +25,10 @@ append_hook () {
 
 # Run all numbered scripts under directories with this hook's name
 append_numbered_hooks () {
-  local hookname=$1
-  shift
-
   # Gather every file into an array, prefixing each item with the
   # filename of the script (its position in sort order)
   local filelist=()
-  for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$hookname"/*; do
+  for hook in "$PLUSHU_ROOT"/plugins/*/hooks/"$1"/*; do
     filelist+=("${hook##*/}/$hook")
   done
 
