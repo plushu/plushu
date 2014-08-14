@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -eo pipefail; [[ -n "$PLUSHU_TRACE" ]] && set -x
 
 # Handle reentrant command-as-string arguments, as used by SSH
 if [[ $1 == "-c" ]]; then
@@ -52,6 +52,9 @@ else
   exit 1
 fi
 
+# Echo all commands if PLUSHU_TRACE was set in .plushurc
+[[ -n "$PLUSHU_TRACE" ]] && set -x
+
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
@@ -88,6 +91,7 @@ done
 while [[ "x$1" == x-* ]]; do case "$1" in
   --trace|-t)
     export PLUSHU_TRACE=1
+    set -x
     shift
     ;;
 
@@ -141,9 +145,6 @@ while [[ "x$1" == x-* ]]; do case "$1" in
     fi
     ;;
 esac done
-
-# Echo all commands if PLUSHU_TRACE is set
-[[ -n "$PLUSHU_TRACE" ]] && set -x
 
 # Source pre-commands
 load_sourcelist pre-commands
