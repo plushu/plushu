@@ -52,25 +52,37 @@ else
   exit 1
 fi
 
-# Handle trace flag
-while [[ $1 == "--trace" || $1 == "-t" ]]; do
-  export PLUSHU_TRACE=1
-  shift
+# Pull opts out of arguments
+opts=()
+while [[ "x$1" == x-* ]]; do
+  case "$1" in
+    --trace|-t)
+      export PLUSHU_TRACE=1
+      shift
+      ;;
+
+    --version|-v)
+      if [ -d "$PLUSHU_ROOT/.git" ]; then
+        GIT_DIR="$PLUSHU_ROOT/.git" git describe
+        exit 0
+      else
+        echo "No .git directory in $PLUSHU_ROOT, version unknown"
+        exit 1
+      fi
+      ;;
+
+    *)
+      opts+=("$1")
+      shift
+      ;;
+  esac
 done
+
+# Restore unprocessed opts
+set -- "${opts[@]}" "$@"
 
 # Echo all commands if PLUSHU_TRACE is set
 [[ -n "$PLUSHU_TRACE" ]] && set -x
-
-# Handle version flag
-if [[ $1 == "--version" || $1 == "-v" ]]; then
-  if [ -d "$PLUSHU_ROOT/.git" ]; then
-    GIT_DIR="$PLUSHU_ROOT/.git" git describe
-    exit 0
-  else
-    echo "No .git directory in $PLUSHU_ROOT, version unknown"
-    exit 1
-  fi
-fi
 
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
@@ -104,6 +116,11 @@ for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands; do
   fi
 done
 
+if [[ "x$1" == x-* ]]; then
+  echo "Unrecognized option: $1" >&2
+  exit 1
+fi
+
 # If a pre-commands hook didn't handle the command
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
   # Run command/subcommand script
@@ -130,6 +147,7 @@ if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
   done
 fi
 
+# If the command has *still* not been handled
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
-  echo "\`$1\`: command not recognized"
+  echo "Command not found: $1"
 fi
