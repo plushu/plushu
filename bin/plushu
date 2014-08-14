@@ -52,38 +52,6 @@ else
   exit 1
 fi
 
-# Pull opts out of arguments
-opts=()
-while [[ "x$1" == x-* ]]; do
-  case "$1" in
-    --trace|-t)
-      export PLUSHU_TRACE=1
-      shift
-      ;;
-
-    --version|-v)
-      if [ -d "$PLUSHU_ROOT/.git" ]; then
-        GIT_DIR="$PLUSHU_ROOT/.git" git describe
-        exit 0
-      else
-        echo "No .git directory in $PLUSHU_ROOT, version unknown"
-        exit 1
-      fi
-      ;;
-
-    *)
-      opts+=("$1")
-      shift
-      ;;
-  esac
-done
-
-# Restore unprocessed opts
-set -- "${opts[@]}" "$@"
-
-# Echo all commands if PLUSHU_TRACE is set
-[[ -n "$PLUSHU_TRACE" ]] && set -x
-
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
 
@@ -106,6 +74,77 @@ load_sourcelist () {
   done | sort -nz)
 }
 
+# Source pre-opts
+load_sourcelist pre-opts
+for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-opts; do
+  # If the path is a file (not a folder)
+  if [[ -f "$script" ]]; then
+    plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+    PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
+  fi
+done
+
+# Process options
+while [[ "x$1" == x-* ]]; do case "$1" in
+  --trace|-t)
+    export PLUSHU_TRACE=1
+    shift
+    ;;
+
+  --version|-v)
+    if [[ -d "$PLUSHU_ROOT/.git" ]]; then
+      GIT_DIR="$PLUSHU_ROOT/.git" git describe
+      exit 0
+    else
+      echo "No .git directory in $PLUSHU_ROOT, version unknown" >&2
+      exit 1
+    fi
+    ;;
+
+  --)
+    # explicitly stop processing arguments
+    # for when the command name (for some inexplicable reason)
+    # starts with a hyphen (nobody should ever do that)
+    shift
+    break
+    ;;
+
+  -)
+    # hyphen is not an option
+    echo "Unrecognized option: -" >&2
+    exit 1
+    ;;
+
+  --*)
+    opt="${1%%=*}"
+    optfiles=("$PLUSHU_ROOT/plugins"/*"/long-opts/${opt#--}")
+    if [[ -n "${optfiles[@]}" ]]; then
+      for optscript in "${optfiles[@]}"; do
+        source "$optscript"
+      done
+    else
+      echo "Unrecognized option: $1" >&2
+      exit 1
+    fi
+    ;;
+
+  -*)
+    opt="${1:1:1}"
+    optfiles=("$PLUSHU_ROOT/plugins"/*"/short-opts/$opt")
+    if [[ -n "${optfiles[@]}" ]]; then
+      for optscript in "${optfiles[@]}"; do
+        source "$optscript"
+      done
+    else
+      echo "Unrecognized option: $1" >&2
+      exit 1
+    fi
+    ;;
+esac done
+
+# Echo all commands if PLUSHU_TRACE is set
+[[ -n "$PLUSHU_TRACE" ]] && set -x
+
 # Source pre-commands
 load_sourcelist pre-commands
 for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands; do
@@ -115,11 +154,6 @@ for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands; do
     PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
   fi
 done
-
-if [[ "x$1" == x-* ]]; then
-  echo "Unrecognized option: $1" >&2
-  exit 1
-fi
 
 # If a pre-commands hook didn't handle the command
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
