@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail; [[ $PLUSHU_TRACE ]] && set -x
+set -eo pipefail; [[ -n "$PLUSHU_TRACE" ]] && set -x
 
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob

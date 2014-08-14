@@ -59,7 +59,7 @@ while [[ $1 == "--trace" || $1 == "-t" ]]; do
 done
 
 # Echo all commands if PLUSHU_TRACE is set
-[[ $PLUSHU_TRACE ]] && set -x
+[[ -n "$PLUSHU_TRACE" ]] && set -x
 
 # Handle version flag
 if [[ $1 == "--version" || $1 == "-v" ]]; then
