@@ -115,8 +115,7 @@ while [[ "x$1" == x-* ]]; do case "$1" in
 
   -)
     # hyphen is not an option
-    echo "Unrecognized option: -" >&2
-    exit 1
+    break
     ;;
 
   --*)
@@ -127,8 +126,7 @@ while [[ "x$1" == x-* ]]; do case "$1" in
         source "$optscript"
       done
     else
-      echo "Unrecognized option: $1" >&2
-      exit 1
+      break
     fi
     ;;
 
@@ -140,8 +138,7 @@ while [[ "x$1" == x-* ]]; do case "$1" in
         source "$optscript"
       done
     else
-      echo "Unrecognized option: $1" >&2
-      exit 1
+      break
     fi
     ;;
 esac done
@@ -184,5 +181,10 @@ fi
 
 # If the command has *still* not been handled
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
-  echo "Command not found: $1"
+  if [[ "x$1" == x-* ]]; then
+    echo "Unrecognized option: $1" >&2
+  else
+    echo "Command not found: $1" >&2
+  fi
+  exit 1
 fi
