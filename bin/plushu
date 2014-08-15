@@ -9,7 +9,7 @@ fi
 
 # If PLUSHU_ROOT is not specially defined, use our home directory
 # (or default to the home directory of the "plushu" user, if running as root)
-if [[ $EUID == 0 ]]; then
+if [[ "$EUID" == 0 ]]; then
   export PLUSHU_ROOT=${PLUSHU_ROOT:-~plushu}
 else
   export PLUSHU_ROOT=${PLUSHU_ROOT:-$HOME}

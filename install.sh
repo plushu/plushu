@@ -55,7 +55,7 @@ else
 fi
 
 # If root is performing the installation
-if [[ $EUID == 0 ]]; then
+if [[ "$EUID" == 0 ]]; then
   # Create the plushu user if they do not exist
   if ! id -u plushu >/dev/null 2>&1; then
     useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_SCRIPT" plushu
