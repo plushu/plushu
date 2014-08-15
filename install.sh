@@ -30,7 +30,8 @@ if command -v git >/dev/null 2>&1; then
       "$PLUSHU_ROOT/plugins/plugins"
   fi
   if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
-    "$PLUSHU_ROOT/bin/plushu" plugins:install help-plugin
+    git clone https://github.com/plushu/plushu-help-plugin \
+      "$PLUSHU_ROOT/plugins/help"
   fi
 elif command -v git >/dev/null 2>&1; then
   echo 'Git does not appear to be present on your system; falling back to'
