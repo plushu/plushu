@@ -18,14 +18,39 @@ cat >"$PLUSHU_ROOT/.plushurc" <<"EOF"
 PATH=$HOME/bin:$PATH
 EOF
 
+gh_archive () {
+  printf '%s\n' "https://github.com/plushu/$1/archive/master.tar.gz"
+}
+
 # Install the core plugins
 mkdir -p "$PLUSHU_ROOT/plugins"
-if [ ! -d "$PLUSHU_ROOT/plugins/plugins" ]; then
-  git clone https://github.com/plushu/plushu-plugins-plugin \
-    "$PLUSHU_ROOT/plugins/plugins"
-fi
-if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
-  plushu plugins:install help-plugin
+if command -v git >/dev/null 2>&1; then
+  if [ ! -d "$PLUSHU_ROOT/plugins/plugins" ]; then
+    git clone https://github.com/plushu/plushu-plugins-plugin \
+      "$PLUSHU_ROOT/plugins/plugins"
+  fi
+  if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
+    plushu plugins:install help-plugin
+  fi
+elif command -v git >/dev/null 2>&1; then
+  echo 'Git does not appear to be present on your system; falling back to'
+  echo 'curl to install the core `plugins` and `help` plugins.'
+  echo 'It is recommended that you install Git for managing plugins;'
+  echo 'if you do, delete plugins/plugins and plugins/help, then rerun'
+  echo 'this installer to re-install these plugins via Git.'
+  if [ ! -d "$PLUSHU_ROOT/plugins/plugins" ]; then
+    curl `gh_archive plushu-plugins-plugin` |
+      tar xzC "$PLUSHU_ROOT/plugins/plugins"
+  fi
+  if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
+    curl `gh_archive plushu-help-plugin` |
+      tar xzC "$PLUSHU_ROOT/plugins/help"
+  fi
+else
+  echo 'The core `plugins` and `help` plugins were not installed because'
+  echo 'Git does not appear to be present on your system (and no `curl`'
+  echo 'fallback was present either).'
+  echo 'To install the core plugins, install Git, then re-run this installer.'
 fi
 
 # If root is performing the installation
