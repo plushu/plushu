@@ -33,11 +33,11 @@ EOF
 
 # Source configuration variables if the config file is present -
 # if the config file is not present, don't trust this as a PLUSHU_ROOT
-if [[ -f $PLUSHU_ROOT/.plushurc ]]; then
-  source $PLUSHU_ROOT/.plushurc
+if [[ -f "$PLUSHU_ROOT/.plushurc" ]]; then
+  source "$PLUSHU_ROOT/.plushurc"
 
   # Ensure this is repeatable
-  if [[ ! -f $PLUSHU_ROOT/.plushurc ]]; then
+  if [[ ! -f "$PLUSHU_ROOT/.plushurc" ]]; then
     echo "No $PLUSHU_ROOT/.plushurc after sourcing .plushurc" >&2
     exit 1
   fi
