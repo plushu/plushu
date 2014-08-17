@@ -52,8 +52,9 @@ else
   exit 1
 fi
 
-# Echo all commands if PLUSHU_TRACE was set in .plushurc
-[[ -n "$PLUSHU_TRACE" ]] && set -x
+# Echo all commands if PLUSHU_TRACE was set in .plushurc,
+# and stop echoing them if it was unset
+[[ -n "$PLUSHU_TRACE" ]] && set -x || set +x
 
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
