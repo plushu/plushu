@@ -90,22 +90,6 @@ done
 
 # Process options
 while [[ "x$1" == x-* ]]; do case "$1" in
-  --trace|-t)
-    export PLUSHU_TRACE=1
-    set -x
-    shift
-    ;;
-
-  --version|-v)
-    if [[ -d "$PLUSHU_ROOT/.git" ]]; then
-      GIT_DIR="$PLUSHU_ROOT/.git" git describe
-      exit 0
-    else
-      echo "No .git directory in $PLUSHU_ROOT, version unknown" >&2
-      exit 1
-    fi
-    ;;
-
   --)
     # explicitly stop processing arguments
     # for when the command name (for some inexplicable reason)
