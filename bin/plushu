@@ -3,8 +3,7 @@ set -eo pipefail; [[ -n "$PLUSHU_TRACE" ]] && set -x
 
 # Handle reentrant command-as-string arguments, as used by SSH
 if [[ $1 == "-c" ]]; then
-  xargs -xa <(printf '%s\n' "$2") "$0"
-  exit
+  exec xargs -xa <(printf '%s\n' "$2") "$0"
 fi
 
 # If PLUSHU_ROOT is not specially defined, use our home directory
