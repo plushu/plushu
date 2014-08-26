@@ -40,8 +40,8 @@ elif command -v git >/dev/null 2>&1; then
   echo 'Git does not appear to be present on your system; falling back to'
   echo 'curl to install the core `plugins`, `help`, and `version` plugins.'
   echo 'It is recommended that you install Git for managing plugins;'
-  echo 'if you do, delete plugins/plugins and plugins/help, then rerun'
-  echo 'this installer to re-install these plugins via Git.'
+  echo 'if you do, delete plugins/*, then rerun this installer to re-install'
+  echo 'these plugins via Git.'
   if [[ ! -d "$PLUSHU_ROOT/plugins/plugins" ]]; then
     curl `gh_archive plushu-plugins-plugin` |
       tar xzC "$PLUSHU_ROOT/plugins/plugins"
