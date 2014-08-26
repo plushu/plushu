@@ -3,7 +3,6 @@ set -eo pipefail
 
 # Setup parameters
 : ${PLUSHU_ROOT:="$(cd "$(dirname "$0")" && pwd)"}
-: ${PLUSHU_SCRIPT:="$PLUSHU_ROOT/bin/plushu"}
 
 # Directory to install plushu script to, unset to disable
 BIN_DIR="${BIN_DIR-/usr/local/bin}"
@@ -66,7 +65,7 @@ fi
 if [[ "$EUID" == 0 ]]; then
   # Create the plushu user if they do not exist
   if ! id -u plushu >/dev/null 2>&1; then
-    useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_SCRIPT" plushu
+    useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushu" plushu
   fi
 
   # Initialize the ssh settings
@@ -81,6 +80,6 @@ if [[ "$EUID" == 0 ]]; then
 
   # Link the plushu script into the bin dir
   if [ -n "$BIN_DIR" ]; then
-    ln -sf "$PLUSHU_SCRIPT" "$BIN_DIR"
+    ln -sf "$PLUSHU_ROOT/bin/plushu" "$BIN_DIR"
   fi
 fi
