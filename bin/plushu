@@ -73,19 +73,16 @@ load_sourcelist () {
   # zero-separated to avoid any possible whitespace-in-filename issues,
   # then direct the zero-separated hook names to `read`
   # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
-  done < <(for script in "$PLUSHU_ROOT"/plugins/*/"$1"/*; do
+  done < <(for script in "$PLUSHU_ROOT"/plugins/*/"$1"/*.sh; do
     printf '%s\0' "${script##*/}/$script"
   done | sort -nz)
 }
 
 # Source pre-opts
 load_sourcelist pre-opts
-for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-opts; do
-  # If the path is a file (not a folder)
-  if [[ -f "$script" ]]; then
-    plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
-    PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
-  fi
+for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-opts.sh; do
+  plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+  PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
 done
 
 # Process options
@@ -105,7 +102,7 @@ while [[ "x$1" == x-* ]]; do case "$1" in
 
   --*)
     opt="${1%%=*}"
-    optfiles=("$PLUSHU_ROOT/plugins"/*"/long-opts/${opt#--}")
+    optfiles=("$PLUSHU_ROOT/plugins"/*"/long-opts/${opt#--}.sh")
     if [[ -n "${optfiles[@]}" ]]; then
       for optscript in "${optfiles[@]}"; do
         source "$optscript"
@@ -117,7 +114,7 @@ while [[ "x$1" == x-* ]]; do case "$1" in
 
   -*)
     opt="${1:1:1}"
-    optfiles=("$PLUSHU_ROOT/plugins"/*"/short-opts/$opt")
+    optfiles=("$PLUSHU_ROOT/plugins"/*"/short-opts/$opt.sh")
     if [[ -n "${optfiles[@]}" ]]; then
       for optscript in "${optfiles[@]}"; do
         source "$optscript"
@@ -130,12 +127,9 @@ esac done
 
 # Source pre-commands
 load_sourcelist pre-commands
-for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands; do
-  # If the path is a file (not a folder)
-  if [[ -f "$script" ]]; then
-    plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
-    PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
-  fi
+for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-commands.sh; do
+  plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+  PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
 done
 
 # If a pre-commands hook didn't handle the command
@@ -155,12 +149,9 @@ fi
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
   # Source commands
   load_sourcelist commands
-  for script in "$PLUSHU_ROOT/plugins"/*/commands "${sourcelist[@]}"; do
-    # If the path is a file (not a folder)
-    if [[ -f "$script" ]]; then
-      plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
-      PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
-    fi
+  for script in "$PLUSHU_ROOT/plugins"/*/commands.sh "${sourcelist[@]}"; do
+    plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+    PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
   done
 fi
 
