@@ -8,7 +8,7 @@ set -eo pipefail
 BIN_DIR="${BIN_DIR-/usr/local/bin}"
 
 # If the root is a git clone, set it to ignore new files
-if [ -d "$PLUSHU_ROOT/.git/info" ]; then
+if [[ -d "$PLUSHU_ROOT/.git/info" ]]; then
   printf '*\n' > "$PLUSHU_ROOT/.git/info/exclude"
 fi
 
@@ -24,15 +24,15 @@ gh_archive () {
 # Install the core plugins
 mkdir -p "$PLUSHU_ROOT/plugins"
 if command -v git >/dev/null 2>&1; then
-  if [ ! -d "$PLUSHU_ROOT/plugins/plugins" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/plugins" ]]; then
     git clone https://github.com/plushu/plushu-plugins-plugin \
       "$PLUSHU_ROOT/plugins/plugins"
   fi
-  if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/help" ]]; then
     git clone https://github.com/plushu/plushu-help-plugin \
       "$PLUSHU_ROOT/plugins/help"
   fi
-  if [ ! -d "$PLUSHU_ROOT/plugins/version" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/version" ]]; then
     git clone https://github.com/plushu/plushu-version \
       "$PLUSHU_ROOT/plugins/version"
   fi
@@ -42,15 +42,15 @@ elif command -v git >/dev/null 2>&1; then
   echo 'It is recommended that you install Git for managing plugins;'
   echo 'if you do, delete plugins/plugins and plugins/help, then rerun'
   echo 'this installer to re-install these plugins via Git.'
-  if [ ! -d "$PLUSHU_ROOT/plugins/plugins" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/plugins" ]]; then
     curl `gh_archive plushu-plugins-plugin` |
       tar xzC "$PLUSHU_ROOT/plugins/plugins"
   fi
-  if [ ! -d "$PLUSHU_ROOT/plugins/help" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/help" ]]; then
     curl `gh_archive plushu-help-plugin` |
       tar xzC "$PLUSHU_ROOT/plugins/help"
   fi
-  if [ ! -d "$PLUSHU_ROOT/plugins/version" ]; then
+  if [[ ! -d "$PLUSHU_ROOT/plugins/version" ]]; then
     curl `gh_archive plushu-version` |
       tar xzC "$PLUSHU_ROOT/plugins/version"
   fi
@@ -79,7 +79,7 @@ if [[ "$EUID" == 0 ]]; then
   chmod 0711 "$PLUSHU_ROOT"
 
   # Link the plushu script into the bin dir
-  if [ -n "$BIN_DIR" ]; then
+  if [[ -n "$BIN_DIR" ]]; then
     ln -sf "$PLUSHU_ROOT/bin/plushu" "$BIN_DIR"
   fi
 fi
