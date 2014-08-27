@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 case "$1" in
-  -c) # Handle reentrant command-as-string arguments, as used by SSH
+  -c) # as used by ssh and sudo -i
     exec xargs -xa <(printf '%s\n' "$2") "$HOME/bin/plushu"
     ;;
-  *) # Treat everything else as direct arguments
+  *) # Treat anything else (probably the empty string) as direct arguments
     exec "$HOME/bin/plushu" "$@"
     ;;
 esac
