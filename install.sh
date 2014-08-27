@@ -70,7 +70,7 @@ if [[ "$EUID" == 0 ]]; then
   if [[ -n "$PLUSHU_USER" ]]; then
     # Create the plushu user if they do not exist
     if ! id -u "$PLUSHU_USER" >/dev/null 2>&1; then
-      useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushu" "$PLUSHU_USER"
+      useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushush" "$PLUSHU_USER"
     fi
 
     # Initialize the ssh settings

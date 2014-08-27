@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+case "$1" in
+  -c) # Handle reentrant command-as-string arguments, as used by SSH
+    exec xargs -xa <(printf '%s\n' "$2") "$HOME/bin/plushu"
+    ;;
+  *) # Treat everything else as direct arguments
+    exec "$HOME/bin/plushu" "$@"
+    ;;
+esac
