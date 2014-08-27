@@ -69,7 +69,7 @@ if [[ "$EUID" == 0 ]]; then
   # If we're set to configure a plushu user
   if [[ -n "$PLUSHU_USER" ]]; then
     # Create the plushu user if they do not exist
-    if ! id -u "$PLUSHU_USER" >/dev/null 2>&1; then
+    if ! id "$PLUSHU_USER" >/dev/null 2>&1; then
       useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushush" "$PLUSHU_USER"
     fi
 
