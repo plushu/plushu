@@ -4,6 +4,9 @@ set -eo pipefail
 # Setup parameters
 PLUSHU_ROOT="${PLUSHU_ROOT:-"$(cd "$(dirname "$0")" && pwd)"}"
 
+# User to set up for Plushu, unset to disable
+PLUSHU_USER="${PLUSHU_USER-plushu}"
+
 # Directory to install plushu script to, unset to disable
 BIN_DIR="${BIN_DIR-/usr/local/bin}"
 
@@ -63,20 +66,23 @@ fi
 
 # If root is performing the installation
 if [[ "$EUID" == 0 ]]; then
-  # Create the plushu user if they do not exist
-  if ! id -u plushu >/dev/null 2>&1; then
-    useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushu" plushu
+  # If we're set to configure a plushu user
+  if [[ -n "$PLUSHU_USER" ]]; then
+    # Create the plushu user if they do not exist
+    if ! id -u "$PLUSHU_USER" >/dev/null 2>&1; then
+      useradd -Md "$PLUSHU_ROOT" -s "$PLUSHU_ROOT/bin/plushu" "$PLUSHU_USER"
+    fi
+
+    # Initialize the ssh settings
+    mkdir -p "$PLUSHU_ROOT/.ssh"
+    touch "$PLUSHU_ROOT/.ssh/authorized_keys"
+    chmod 0700 "$PLUSHU_ROOT/.ssh"
+    chmod 0600 "$PLUSHU_ROOT/.ssh/authorized_keys"
+
+    # Set appropriate ownership and permissions
+    chown -R "$PLUSHU_USER" "$PLUSHU_ROOT"
+    chmod 0711 "$PLUSHU_ROOT"
   fi
-
-  # Initialize the ssh settings
-  mkdir -p "$PLUSHU_ROOT/.ssh"
-  touch "$PLUSHU_ROOT/.ssh/authorized_keys"
-  chmod 0700 "$PLUSHU_ROOT/.ssh"
-  chmod 0600 "$PLUSHU_ROOT/.ssh/authorized_keys"
-
-  # Set appropriate ownership and permissions
-  chown -R plushu "$PLUSHU_ROOT"
-  chmod 0711 "$PLUSHU_ROOT"
 
   # Link the plushu script into the bin dir
   if [[ -n "$BIN_DIR" ]]; then
