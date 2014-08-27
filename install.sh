@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Setup parameters
-: ${PLUSHU_ROOT:="$(cd "$(dirname "$0")" && pwd)"}
+PLUSHU_ROOT="${PLUSHU_ROOT:-"$(cd "$(dirname "$0")" && pwd)"}"
 
 # Directory to install plushu script to, unset to disable
 BIN_DIR="${BIN_DIR-/usr/local/bin}"
