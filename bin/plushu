@@ -85,7 +85,7 @@ for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-opts.sh; do
 done
 
 # Process options
-while [[ "x$1" == x-* ]]; do case "$1" in
+while [[ "$1" == -* ]]; do case "$1" in
   --)
     # explicitly stop processing arguments
     # for when the command name (for some inexplicable reason)
@@ -156,7 +156,7 @@ fi
 
 # If the command has *still* not been handled
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
-  if [[ "x$1" == x-* ]]; then
+  if [[ "$1" == -* ]]; then
     echo "Unrecognized option: $1" >&2
   else
     echo "Command not found: $1" >&2
