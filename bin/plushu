@@ -105,6 +105,13 @@ load_sourcelist () {
   done | sort -nz)
 }
 
+# Source profiles
+load_sourcelist profile
+for script in "$PLUSHU_ROOT/plugins"/*/profile.sh "${sourcelist[@]}"; do
+  plugin_subpath=${script#$PLUSHU_ROOT/plugins/}
+  PLUSHU_PLUGIN_NAME=${plugin_subpath%%/*} source "$script"
+done
+
 # Source pre-opts
 load_sourcelist pre-opts
 for script in "${sourcelist[@]}" "$PLUSHU_ROOT/plugins"/*/pre-opts.sh; do
