@@ -80,7 +80,7 @@ if [[ "$EUID" == 0 ]]; then
     chmod 0600 "$PLUSHU_ROOT/.ssh/authorized_keys"
 
     # Set appropriate ownership and permissions
-    chown -R "$PLUSHU_USER" "$PLUSHU_ROOT"
+    chown -R "$PLUSHU_USER:" "$PLUSHU_ROOT"
     chmod 0711 "$PLUSHU_ROOT"
   fi
 
