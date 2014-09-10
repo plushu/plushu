@@ -18,6 +18,13 @@ if [[ -z "$PLUSHU_USER" ]]; then
   if [[ -n "$PLUSHU_ROOT" ]]; then
     # Default to the owner of PLUSHU_ROOT
     PLUSHU_USER=`ls -ld "$PLUSHU_ROOT" | cut -d' ' -f3`
+
+    # If the PLUSHU_GROUP is not explicitly defined
+    if [[ -z "$PLUSHU_GROUP" ]]; then
+      # Default to the owner of PLUSHU_ROOT as well
+      PLUSHU_GROUP=`ls -ld "$PLUSHU_ROOT" | cut -d' ' -f4`
+    fi
+
   # If PLUSHU_ROOT is not explicitly defined
   else
     # If the current user is root
@@ -38,8 +45,15 @@ else
   check_plushu_user
 fi
 
+# If the PLUSHU_GROUP is not explicitly defined
+if [[ -z "$PLUSHU_GROUP" ]]; then
+  # Use PLUSHU_USER's primary group
+  PLUSHU_GROUP=`id -gn "$PLUSHU_USER"`
+fi
+
 # Export Plushu's config values to commands and hooks
 export PLUSHU_USER
+export PLUSHU_GROUP
 export PLUSHU_ROOT
 
 # Set up the root for plugins to use
