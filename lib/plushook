@@ -20,16 +20,19 @@ if [[ -z "$hookname" ]]; then
   exit 1
 fi
 
-# Ensure we have a plugins root directory
-if [[ -z "$PLUSHU_PLUGINS_ROOT" ]]; then
-  echo "plushook: PLUSHU_PLUGINS_ROOT not defined" >&2
-  exit 1
-# Ensure plugins will have a root directory
-elif [[ -z "$PLUSHU_ROOT" ]]; then
+# Ensure we have a root directory
+if [[ -z "$PLUSHU_ROOT" ]]; then
   echo "plushook: PLUSHU_ROOT not defined" >&2
   exit 1
 fi
-plugins_dir=$PLUSHU_PLUGINS_ROOT/plugins
+
+# Derive the other requisite directories if missing
+if [[ -z "$PLUSHU_DIR" ]]; then
+  export PLUSHU_DIR=$PLUSHU_ROOT
+fi
+if [[ -z "$PLUSHU_PLUGINS_DIR" ]]; then
+  export PLUSHU_PLUGINS_DIR=$PLUSHU_DIR/plugins
+fi
 
 hooks=()
 
@@ -50,7 +53,7 @@ append_numbered_hooks () {
   # zero-separated to avoid any possible whitespace-in-filename issues,
   # then direct the zero-separated hook names to `read`
   # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
-  done < <(for hook in "$plugins_dir"/*/hooks/"$1"/*; do
+  done < <(for hook in "$PLUSHU_PLUGINS_DIR"/*/hooks/"$1"/*; do
     printf '%s\0' "${hook##*/}/$hook"
   done | sort -nz)
 }
@@ -59,12 +62,12 @@ append_numbered_hooks () {
 append_numbered_hooks "pre-$hookname"
 
 # Run other pre-hooks
-for hook in "$plugins_dir"/*/hooks/"pre-$hookname"; do
+for hook in "$PLUSHU_PLUGINS_DIR"/*/hooks/"pre-$hookname"; do
   append_hook "$hook"
 done
 
 # Run normal hooks
-for hook in "$plugins_dir"/*/hooks/"$hookname"; do
+for hook in "$PLUSHU_PLUGINS_DIR"/*/hooks/"$hookname"; do
   append_hook "$hook"
 done
 
@@ -74,13 +77,15 @@ append_numbered_hooks "$hookname"
 # If we have only one hook
 if [[ "${#hooks[@]}" == 1 ]]; then
   # Run it directly, only exposing input if opted in
-  subpath=${hooks[0]#$plugins_dir/}
+  subpath=${hooks[0]#$PLUSHU_PLUGINS_DIR/}
   name=${subpath%%/*}
   if [[ -n "$input" ]]; then
-    PLUSHU_PLUGIN_NAME="$name" PLUSHU_PLUGIN_PATH="$plugins_dir/$name" \
+    PLUSHU_PLUGIN_NAME="$name" \
+    PLUSHU_PLUGIN_PATH="$PLUSHU_PLUGINS_DIR/$name" \
       "${hooks[0]}" "$@"
   else
-    PLUSHU_PLUGIN_NAME="$name" PLUSHU_PLUGIN_PATH="$plugins_dir/$name" \
+    PLUSHU_PLUGIN_NAME="$name" \
+    PLUSHU_PLUGIN_PATH="$PLUSHU_PLUGINS_DIR/$name" \
       "${hooks[0]}" "$@" </dev/null
   fi
 
@@ -95,13 +100,15 @@ elif [[ "${#hooks[@]}" != 0 ]]; then
 
   # Run each hook, directing our saved input (if we have any) to it
   for hook in "${hooks[@]}"; do
-    subpath=${hook#$plugins_dir/}
+    subpath=${hook#$PLUSHU_PLUGINS_DIR/}
     name=${subpath%%/*}
     if [[ -n "$input" ]]; then
-      PLUSHU_PLUGIN_NAME="$name" PLUSHU_PLUGIN_PATH="$plugins_dir/$name" \
+      PLUSHU_PLUGIN_NAME="$name" \
+      PLUSHU_PLUGIN_PATH="$PLUSHU_PLUGINS_DIR/$name" \
         "$hook" "$@" <"$input"
     else
-      PLUSHU_PLUGIN_NAME="$name" PLUSHU_PLUGIN_PATH="$plugins_dir/$name" \
+      PLUSHU_PLUGIN_NAME="$name" \
+      PLUSHU_PLUGIN_PATH="$PLUSHU_PLUGINS_DIR/$name" \
         "$hook" "$@" </dev/null
     fi
   done
