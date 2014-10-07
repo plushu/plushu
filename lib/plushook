@@ -44,7 +44,7 @@ append_hook () {
 }
 
 # Run all numbered scripts under directories with this hook's name
-append_numbered () {
+append_all () {
   # For each null-separated "line"
   while IFS= read -rd '' hookline; do
     # Append the hook's filename to the list of hooks
@@ -53,26 +53,21 @@ append_numbered () {
   # zero-separated to avoid any possible whitespace-in-filename issues,
   # then direct the zero-separated hook names to `read`
   # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
-  done < <(for hook in "$PLUSHU_PLUGINS_DIR"/*/"$1/$hookname"/*; do
-    printf '%s\0' "${hook##*/}/$hook"
-  done | sort -z $2)
+  done < <( {
+    for hook in "$PLUSHU_PLUGINS_DIR"/*/"$1/$hookname"/*; do
+      printf '%s\0' "${hook##*/}/$hook"
+    done
+    for hook in "$PLUSHU_PLUGINS_DIR"/*/"$1/$hookname"; do
+      printf '0/%s\0' "$hook"
+    done
+    } | sort -z $2)
 }
 
-# Add numbered early hooks
-append_numbered early-hooks -nr
+# Add early hooks
+append_all early-hooks -nr
 
-# Add numberless early hooks
-for hook in "$PLUSHU_PLUGINS_DIR"/*/early-hooks/"$hookname"; do
-  append_hook "$hook"
-done
-
-# Add numberless hooks
-for hook in "$PLUSHU_PLUGINS_DIR"/*/hooks/"$hookname"; do
-  append_hook "$hook"
-done
-
-# Add ordered hooks
-append_numbered hooks -n
+# Add hooks
+append_all hooks -n
 
 # If we have only one hook
 if [[ "${#hooks[@]}" == 1 ]]; then
