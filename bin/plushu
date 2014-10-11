@@ -110,7 +110,7 @@ load_sourcelist () {
 
 # Source profiles
 load_sourcelist profile
-for script in "$PLUSHU_PLUGINS_DIR"/*/profile.sh "${sourcelist[@]}"; do
+for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
   PLUSHU_PLUGIN_NAME="$plugin_name" \
@@ -120,7 +120,7 @@ done
 
 # Source pre-opts
 load_sourcelist pre-opts -n
-for script in "${sourcelist[@]}" "$PLUSHU_PLUGINS_DIR"/*/pre-opts.sh; do
+for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
   PLUSHU_PLUGIN_NAME="$plugin_name" \
@@ -178,7 +178,7 @@ esac done
 
 # Source pre-commands
 load_sourcelist pre-commands -n
-for script in "${sourcelist[@]}" "$PLUSHU_PLUGINS_DIR"/*/pre-commands.sh; do
+for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
   PLUSHU_PLUGIN_NAME="$plugin_name" \
@@ -205,7 +205,7 @@ fi
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
   # Source commands
   load_sourcelist commands -n
-  for script in "$PLUSHU_PLUGINS_DIR"/*/commands.sh "${sourcelist[@]}"; do
+  for script in "${sourcelist[@]}"; do
     plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
     plugin_name=${plugin_subpath%%/*}
     PLUSHU_PLUGIN_NAME="$plugin_name" \
