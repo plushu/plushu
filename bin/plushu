@@ -109,7 +109,7 @@ load_sourcelist () {
 }
 
 # Source profiles
-load_sourcelist profile
+load_sourcelist profile.d
 for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
