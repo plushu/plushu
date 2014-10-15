@@ -39,6 +39,10 @@ if command -v git >/dev/null 2>&1; then
     git clone https://github.com/plushu/plushu-version \
       "$PLUSHU_ROOT/plugins/version"
   fi
+  if [[ ! -d "$PLUSHU_ROOT/plugins/git" ]]; then
+    git clone https://github.com/plushu/plushu-git \
+      "$PLUSHU_ROOT/plugins/git"
+  fi
 elif command -v git >/dev/null 2>&1; then
   echo 'Git does not appear to be present on your system; falling back to'
   echo 'curl to install the core `plugins`, `help`, and `version` plugins.'
