@@ -1,4 +1,5 @@
 # plushu
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/plushu/plushu?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 plushu is a shell, intended for use as a dedicated SSH user, whose commands are
 entirely specified by installed plugins.
