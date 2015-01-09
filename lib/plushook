@@ -36,38 +36,25 @@ fi
 
 hooks=()
 
-# Run a hook script, if it's executable, with the input from this invocation
-append_hook () {
+# For each null-separated "line"
+while IFS= read -rd '' hookline; do
+  # Append the hook's filename to the list of hooks
   if [[ -f "$1" && -x "$1" ]]; then
     hooks+=("$1")
   fi
-}
-
-# Run all numbered scripts under directories with this hook's name
-append_all () {
-  # For each null-separated "line"
-  while IFS= read -rd '' hookline; do
-    # Append the hook's filename to the list of hooks
-    append_hook "${hookline#*/}"
-  # Echo the potential hook names to numerically sort (filename first),
-  # zero-separated to avoid any possible whitespace-in-filename issues,
-  # then direct the zero-separated hook names to `read`
-  # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
-  done < <( {
-    for hook in "$PLUSHU_PLUGINS_DIR"/*/"$1/$hookname"/*; do
-      printf '%s\0' "${hook##*/}/$hook"
-    done
-    for hook in "$PLUSHU_PLUGINS_DIR"/*/"$1/$hookname"; do
-      printf '0/%s\0' "$hook"
-    done
-    } | sort -z $2)
-}
-
-# Add early hooks
-append_all early-hooks -nr
-
-# Add hooks
-append_all hooks -n
+# Echo the potential hook names to numerically sort (filename first),
+# zero-separated to avoid any possible whitespace-in-filename issues,
+# then direct the zero-separated hook names to `read`
+# via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
+done < <( {
+  for hook in "$PLUSHU_PLUGINS_DIR"/*/"hooks/$hookname"/*; do
+    printf '%s\0' "${hook##*/}/$hook"
+  done
+  # Support for deprecated non-numbered hooks (see issue #48)
+  for hook in "$PLUSHU_PLUGINS_DIR"/*/"hooks/$hookname"; do
+    printf '0/%s\0' "$hook"
+  done
+} | sort -nz)
 
 # If we have only one hook
 if [[ "${#hooks[@]}" == 1 ]]; then
