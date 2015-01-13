@@ -50,10 +50,6 @@ done < <( {
   for hook in "$PLUSHU_PLUGINS_DIR"/*/"hooks/$hookname"/*; do
     printf '%s\0' "${hook##*/}/$hook"
   done
-  # Support for deprecated non-numbered hooks (see issue #48)
-  for hook in "$PLUSHU_PLUGINS_DIR"/*/"hooks/$hookname"; do
-    printf '0/%s\0' "$hook"
-  done
 } | sort -nz)
 
 # If we have only one hook
