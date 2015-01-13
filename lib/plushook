@@ -39,9 +39,8 @@ hooks=()
 # For each null-separated "line"
 while IFS= read -rd '' hookline; do
   # Append the hook's filename to the list of hooks
-  if [[ -f "$1" && -x "$1" ]]; then
-    hooks+=("$1")
-  fi
+  hooks+=("${hookline#*/}")
+
 # Echo the potential hook names to numerically sort (filename first),
 # zero-separated to avoid any possible whitespace-in-filename issues,
 # then direct the zero-separated hook names to `read`
