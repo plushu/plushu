@@ -38,54 +38,7 @@ else
   check_plushu_user
 fi
 
-# Export Plushu's config values to commands and hooks
-export PLUSHU_USER
-export PLUSHU_ROOT
-
-# Set up the root for plugins to use and the plugins dir
-export PLUSHU_DIR=$PLUSHU_ROOT
-export PLUSHU_PLUGINS_DIR=$PLUSHU_DIR/plugins
-
-echo_missing_plushurc_msg () {
-cat <<EOF
-This file just needs to be present; you can create an empty one with:
-
-\$ sudo -u plushu touch $PLUSHU_ROOT/.plushurc
-EOF
-}
-
-echo_run_as_plushu_msg () {
-cat <<EOF
-If you meant to run plushu as the plushu user, try:
-
-\$ sudo -iu plushu $@
-EOF
-}
-
-# Source configuration variables if the config file is present -
-# if the config file is not present, don't trust this as a PLUSHU_ROOT
-if [[ -f "$PLUSHU_ROOT/.plushurc" ]]; then
-  source "$PLUSHU_ROOT/.plushurc"
-
-  # Ensure this is repeatable
-  if [[ ! -f "$PLUSHU_ROOT/.plushurc" ]]; then
-    echo "No $PLUSHU_ROOT/.plushurc after sourcing .plushurc" >&2
-    exit 1
-  fi
-else
-  echo "No ~/.plushurc found." >&2
-  echo >&2
-  if [[ "$PLUSHU_USER" == "plushu" ]]; then
-    echo_missing_plushurc_msg >&2
-  else
-    echo_run_as_plushu_msg >&2
-  fi
-  exit 1
-fi
-
-# Echo all commands if PLUSHU_TRACE was set in .plushurc,
-# and stop echoing them if it was unset
-[[ -n "$PLUSHU_TRACE" ]] && set -x || set +x
+source "$PLUSHU_ROOT/lib/profile.sh"
 
 # For instances where a glob has no matches we want an empty list
 shopt -s nullglob
@@ -105,21 +58,11 @@ load_sourcelist () {
   # via process substitution (see http://mywiki.wooledge.org/BashFAQ/024)
   done < <(for script in "$PLUSHU_PLUGINS_DIR"/*/"$1"/*.sh; do
     printf '%s\0' "${script##*/}/$script"
-  done | sort -z $2)
+  done | sort -nz)
 }
 
-# Source profiles
-load_sourcelist profile.d
-for script in "${sourcelist[@]}"; do
-  plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
-  plugin_name=${plugin_subpath%%/*}
-  PLUSHU_PLUGIN_NAME="$plugin_name" \
-  PLUSHU_PLUGIN_PATH="$PLUSHU_PLUGINS_DIR/$plugin_name" \
-    source "$script"
-done
-
 # Source pre-opts
-load_sourcelist pre-opts -n
+load_sourcelist pre-opts
 for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
@@ -177,7 +120,7 @@ while [[ "$1" == -* ]]; do case "$1" in
 esac done
 
 # Source pre-commands
-load_sourcelist pre-commands -n
+load_sourcelist pre-commands
 for script in "${sourcelist[@]}"; do
   plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
   plugin_name=${plugin_subpath%%/*}
@@ -204,7 +147,7 @@ fi
 # If there wasn't a command script to handle it
 if [[ -z "$PLUSHU_COMMAND_HANDLED" ]]; then
   # Source commands
-  load_sourcelist commands -n
+  load_sourcelist commands
   for script in "${sourcelist[@]}"; do
     plugin_subpath=${script#$PLUSHU_PLUGINS_DIR/}
     plugin_name=${plugin_subpath%%/*}
