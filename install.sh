@@ -17,7 +17,7 @@ fi
 
 # Create an initial .plushurc
 cat >"$PLUSHU_ROOT/.plushurc" <<"EOF"
-PATH=$HOME/bin:$PATH
+export PATH=$HOME/bin:$PATH
 EOF
 
 gh_archive () {
