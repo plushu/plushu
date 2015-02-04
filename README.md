@@ -64,9 +64,50 @@ authorized keys for plushu with a command like:
 ssh root@example.com "cat >>/home/plushu/.ssh/authorized_keys" <~/.ssh/id_rsa.pub
 ```
 
-Note that, by default, plushu does *not* discriminate between authorized keys
-in any way. If you need this (for instance, to have administrative and normal
-users), you should install a plugin and edit authorized_keys accordingly.
+By default, plushu does *not* discriminate between authorized keys in any way.
+If you need this (for instance, to have administrative and normal users based
+on the key being used), you should install a plugin and edit authorized_keys
+accordingly.
+
+Note that, if you don't disable port forwarding, agent forwarding, or X11
+forwarding globally, you will likely want to do it for each key in
+authorized_keys. See next section.
+
+### Restricting ssh
+
+By default, `sshd` allows users to forward ports, agent credentials, and
+streams from the local machine. There are also options, disabled by default,
+to allow X11 forwarding and device tunneling. These features will allow users
+to bypass the `plushu` shell and perform actions that you would likely
+otherwise want restricted.
+
+To change these at the system configuration level, you must edit
+`/etc/ssh/sshd_config` to set these options (optionally under a
+`Match User plushu` line to limit the restictions to only the `plushu` user):
+
+```
+AllowTcpForwarding no
+AllowStreamLocalForwarding no
+AllowAgentForwarding no
+X11Forwarding no
+PermitTunnel no
+```
+
+This is the recommended way to restrict the `plushu` user, as it is managed by
+files the `plushu` user does not normally have write access to (and it appears
+to be the only way to restrict access to StreamLocal forwarding).
+
+You may also use options before each key in the `authorized_keys` file to
+disable port, agent, and X11 forwarding, as well as preventing execution of
+`.ssh/rc` if present:
+
+```
+no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-user-rc ssh-rsa (etc...)
+```
+
+This can be used if editing the global `sshd` configuration is not an option
+for whatever reason, or if you only want to restrict these features for certain
+keys, or if you just want to specify restrictions redundantly.
 
 ## Accessing plushu
 
