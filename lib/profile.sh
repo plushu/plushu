@@ -14,7 +14,7 @@ if [[ -z "$PLUSHU_USER" ]]; then
   # If PLUSHU_ROOT is explicitly defined
   if [[ -n "$PLUSHU_ROOT" ]]; then
     # Default to the owner of PLUSHU_ROOT
-    PLUSHU_USER=$(ls -ld "$PLUSHU_ROOT" | cut -d' ' -f3)
+    PLUSHU_USER=$(stat -c '%U' "$PLUSHU_ROOT")
   # If PLUSHU_ROOT is not explicitly defined
   else
     # If the current user is root
