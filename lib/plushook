@@ -71,7 +71,7 @@ elif [[ "${#hooks[@]}" != 0 ]]; then
 
   # If we're supposed to multiplex stdin, save it to a temp file
   if [[ -n "$input" ]]; then
-    input=`mktemp`;
+    input=$(mktemp);
     cat >"$input"
   fi
 

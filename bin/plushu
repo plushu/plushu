@@ -8,7 +8,7 @@ check_plushu_user () {
   # If the PLUSHU_ROOT is not explicitly defined
   if [[ -z "$PLUSHU_ROOT" ]]; then
     # use PLUSHU_USER's home directory
-    PLUSHU_ROOT=`getent passwd "$PLUSHU_USER" | cut -d: -f6`
+    PLUSHU_ROOT=$(getent passwd "$PLUSHU_USER" | cut -d: -f6)
   fi
 }
 
@@ -17,7 +17,7 @@ if [[ -z "$PLUSHU_USER" ]]; then
   # If PLUSHU_ROOT is explicitly defined
   if [[ -n "$PLUSHU_ROOT" ]]; then
     # Default to the owner of PLUSHU_ROOT
-    PLUSHU_USER=`ls -ld "$PLUSHU_ROOT" | cut -d' ' -f3`
+    PLUSHU_USER=$(ls -ld "$PLUSHU_ROOT" | cut -d' ' -f3)
   # If PLUSHU_ROOT is not explicitly defined
   else
     # If the current user is root
@@ -28,7 +28,7 @@ if [[ -z "$PLUSHU_USER" ]]; then
     # For any non-root user
     else
       # use the current user
-      PLUSHU_USER=`id -un`
+      PLUSHU_USER=$(id -un)
       # use the current user's home as the default PLUSHU_ROOT
       PLUSHU_ROOT=${PLUSHU_ROOT:-$HOME}
     fi

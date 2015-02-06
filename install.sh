@@ -50,15 +50,15 @@ elif command -v curl >/dev/null 2>&1; then
   echo 'if you do, delete plugins/*, then rerun this installer to re-install'
   echo 'these plugins via Git.'
   if [[ ! -d "$PLUSHU_ROOT/plugins/plugins" ]]; then
-    curl `gh_archive plushu-plugins-plugin` |
+    curl $(gh_archive plushu-plugins-plugin) |
       tar xzC "$PLUSHU_ROOT/plugins/plugins"
   fi
   if [[ ! -d "$PLUSHU_ROOT/plugins/help" ]]; then
-    curl `gh_archive plushu-help-plugin` |
+    curl $(gh_archive plushu-help-plugin) |
       tar xzC "$PLUSHU_ROOT/plugins/help"
   fi
   if [[ ! -d "$PLUSHU_ROOT/plugins/version" ]]; then
-    curl `gh_archive plushu-version` |
+    curl $(gh_archive plushu-version) |
       tar xzC "$PLUSHU_ROOT/plugins/version"
   fi
 else
