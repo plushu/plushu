@@ -94,4 +94,10 @@ elif [[ "${#hooks[@]}" != 0 ]]; then
   if [[ -n "$input" ]]; then
     rm "$input"
   fi
+
+# If we're taking input and there's no hook script to read it
+elif [[ -n "$input" ]]; then
+
+  # Dutifully read and throw it out so as to not break the pipe
+  cat >/dev/null
 fi
